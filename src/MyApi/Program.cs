@@ -23,6 +23,11 @@ if (!string.IsNullOrEmpty(httpPorts) || !string.IsNullOrEmpty(httpsPorts))
         builder.WebHost.UseUrls(string.Join(';', urlList));
     }
 }
+else
+{
+    // Fallback to default port 80 if no platform ports provided
+    builder.WebHost.UseUrls("http://+:80");
+}
 
 // Add services
 builder.Services.AddEndpointsApiExplorer();
