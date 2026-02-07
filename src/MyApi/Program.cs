@@ -5,6 +5,9 @@ var httpPorts = Environment.GetEnvironmentVariable("HTTP_PORTS");
 var httpsPorts = Environment.GetEnvironmentVariable("HTTPS_PORTS");
 if (!string.IsNullOrEmpty(httpPorts) || !string.IsNullOrEmpty(httpsPorts))
 {
+    // Unset ASPNETCORE_URLS to avoid conflicts with platform-set ports
+    Environment.SetEnvironmentVariable("ASPNETCORE_URLS", null);
+
     var urlList = new List<string>();
     if (!string.IsNullOrEmpty(httpPorts))
     {
@@ -36,7 +39,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Log effective environment and bindings for debugging
-app.Logger.LogInformation("HTTP_PORTS='{httpPorts}' HTTPS_PORTS='{httpsPorts}' ASPNETCORE_URLS='{asp}'", httpPorts, httpsPorts, Environment.GetEnvironmentVariable("ASPNETCORE_URLS"));
+app.Logger.LogInformation("HTTP_PORTS='{httpPorts}' HTTPS_PORTS='{httpsPorts}' ASPNETCORE_URLS='{asp}'", Environment.GetEnvironmentVariable("HTTP_PORTS"), Environment.GetEnvironmentVariable("HTTPS_PORTS"), Environment.GetEnvironmentVariable("ASPNETCORE_URLS"));
 app.Logger.LogInformation("Hosting environment: {env}", app.Environment.EnvironmentName);
 app.Logger.LogInformation("Now listening on: {urls}", string.Join(',', app.Urls));
 
