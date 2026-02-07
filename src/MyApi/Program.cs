@@ -1,35 +1,17 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// If the platform provides HTTP_PORTS/HTTPS_PORTS (e.g., Coolify), prefer those and apply to Kestrel
+// If the platform provides HTTP_PORTS/HTTPS_PORTS (e.g., Coolify), let ASP.NET Core use them by unsetting ASPNETCORE_URLS
 var httpPorts = Environment.GetEnvironmentVariable("HTTP_PORTS");
 var httpsPorts = Environment.GetEnvironmentVariable("HTTPS_PORTS");
 if (!string.IsNullOrEmpty(httpPorts) || !string.IsNullOrEmpty(httpsPorts))
 {
-    // Unset ASPNETCORE_URLS to avoid conflicts with platform-set ports
+    // Unset ASPNETCORE_URLS to allow HTTP_PORTS to take effect without conflicts
     Environment.SetEnvironmentVariable("ASPNETCORE_URLS", null);
-
-    var urlList = new List<string>();
-    if (!string.IsNullOrEmpty(httpPorts))
-    {
-        // Use the first HTTP port if CSV provided
-        var port = httpPorts.Split(',')[0].Trim();
-        urlList.Add($"http://+:{port}");
-    }
-    if (!string.IsNullOrEmpty(httpsPorts))
-    {
-        var port = httpsPorts.Split(',')[0].Trim();
-        urlList.Add($"https://+:{port}");
-    }
-
-    if (urlList.Any())
-    {
-        builder.WebHost.UseUrls(string.Join(';', urlList));
-    }
 }
 else
 {
     // Fallback to default port 80 if no platform ports provided
-    builder.WebHost.UseUrls("http://+:80");
+    Environment.SetEnvironmentVariable("ASPNETCORE_URLS", "http://+:80");
 }
 
 // Add services
@@ -57,6 +39,8 @@ var todos = new List<Todo>
 };
 
 app.MapGet("/", () => Results.Ok("Hello World!"));
+
+app.MapGet("/health", () => Results.Ok("OK"));
 
 app.MapGet("/todos", () => Results.Ok(todos));
 
