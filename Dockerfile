@@ -14,7 +14,11 @@ RUN dotnet publish "MyApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-ENV ASPNETCORE_URLS="http://+:80"
+# Copy published app and entrypoint
 COPY --from=build /app/publish .
-EXPOSE 80
-ENTRYPOINT ["dotnet", "MyApi.dll"]
+COPY src/MyApi/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+# Let the platform pass HTTP_PORTS (e.g. Coolify) and let the entrypoint set ASPNETCORE_URLS at runtime
+# Expose a generic service port of 8080 (matches Coolify default)
+EXPOSE 8080
+ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
