@@ -18,7 +18,5 @@ WORKDIR /app
 COPY --from=build /app/publish .
 COPY src/MyApi/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
-# Let the platform pass HTTP_PORTS (e.g. Coolify) and let the entrypoint set ASPNETCORE_URLS at runtime
-# Expose a generic service port of 8080 (matches Coolify default)
 EXPOSE 8080
 ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
