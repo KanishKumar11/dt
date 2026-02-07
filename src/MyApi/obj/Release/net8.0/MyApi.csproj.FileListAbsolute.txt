@@ -28,3 +28,4 @@ K:\2026\dt\src\MyApi\obj\Release\net8.0\refint\MyApi.dll
 K:\2026\dt\src\MyApi\obj\Release\net8.0\MyApi.pdb
 K:\2026\dt\src\MyApi\obj\Release\net8.0\MyApi.genruntimeconfig.cache
 K:\2026\dt\src\MyApi\obj\Release\net8.0\ref\MyApi.dll
+K:\2026\dt\src\MyApi\obj\Release\net8.0\MyApi.sourcelink.json

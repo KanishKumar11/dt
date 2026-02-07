@@ -1,10 +1,39 @@
 var builder = WebApplication.CreateBuilder(args);
 
+// If the platform provides HTTP_PORTS/HTTPS_PORTS (e.g., Coolify), prefer those and apply to Kestrel
+var httpPorts = Environment.GetEnvironmentVariable("HTTP_PORTS");
+var httpsPorts = Environment.GetEnvironmentVariable("HTTPS_PORTS");
+if (!string.IsNullOrEmpty(httpPorts) || !string.IsNullOrEmpty(httpsPorts))
+{
+    var urlList = new List<string>();
+    if (!string.IsNullOrEmpty(httpPorts))
+    {
+        // Use the first HTTP port if CSV provided
+        var port = httpPorts.Split(',')[0].Trim();
+        urlList.Add($"http://+:{port}");
+    }
+    if (!string.IsNullOrEmpty(httpsPorts))
+    {
+        var port = httpsPorts.Split(',')[0].Trim();
+        urlList.Add($"https://+:{port}");
+    }
+
+    if (urlList.Any())
+    {
+        builder.WebHost.UseUrls(string.Join(';', urlList));
+    }
+}
+
 // Add services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Log effective environment and bindings for debugging
+app.Logger.LogInformation("HTTP_PORTS='{httpPorts}' HTTPS_PORTS='{httpsPorts}' ASPNETCORE_URLS='{asp}'", httpPorts, httpsPorts, Environment.GetEnvironmentVariable("ASPNETCORE_URLS"));
+app.Logger.LogInformation("Hosting environment: {env}", app.Environment.EnvironmentName);
+app.Logger.LogInformation("Now listening on: {urls}", string.Join(',', app.Urls));
 
 // Enable Swagger in Development
 if (app.Environment.IsDevelopment())
